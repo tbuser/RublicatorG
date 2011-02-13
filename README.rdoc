@@ -1,0 +1,11 @@
+Provides a programming interface to commnicate with a MakerBot or RepRap 3D printer that is using the MakerBot firmware.
+
+Should eventually be able to do everything that ReplicatorG can do... but for now it is very incomplete.
+
+=Examples
+
+  require "rublicatorg"
+
+  makerbot = RublicatorG.new("/dev/tty.usbserial-FTE3Q0I3")
+
+  puts "Motherboard Firmware Version: #{makerbot.get_motherboard_version}"
