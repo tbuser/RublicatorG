@@ -283,7 +283,7 @@ class RublicatorG
     crc
   end
 
-  def get_motherboard_version
+  def motherboard_version
     if result = send_and_receive([@@motherboard_codes["version"]])
       result = result.unpack("v")[0]
       "#{result/100}.#{result % 100}"
@@ -292,7 +292,7 @@ class RublicatorG
     end
   end
 
-  def get_motherboard_build_name
+  def motherboard_build_name
     if result = send_and_receive([@@motherboard_codes["get_build_name"]])
       result
     else
@@ -308,7 +308,7 @@ class RublicatorG
     end
   end
 
-  def machine_name
+  def name
     payload = []
     payload << @@motherboard_codes["read_eeprom"]
     # at position: 32, integer uint16 to 2 bytes
@@ -324,7 +324,7 @@ class RublicatorG
     end
   end
 
-  def get_toolhead_version(tool_id=0)
+  def toolhead_version(tool_id=0)
     payload = [@@motherboard_codes["tool_query"], tool_id, @@toolhead_codes["version"]]
     
     if result = send_and_receive(payload)
@@ -335,7 +335,7 @@ class RublicatorG
     end
   end
 
-  def get_toolhead_build_name(tool_id=0)
+  def toolhead_build_name(tool_id=0)
     payload = [@@motherboard_codes["tool_query"], tool_id, @@toolhead_codes["get_build_name"]]
     
     if result = send_and_receive(payload)
