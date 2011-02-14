@@ -91,6 +91,8 @@ class RublicatorG
     "playback_file"           => 0x10,
     "reset"                   => 0x11,
     "next_filename"           => 0x12,
+    "read_debug_registers"    => 0x13,
+    "get_build_name"          => 0x14,
     # buffered
     "queue_point_absolute"    => 0x81,
     "set_position_registers"  => 0x82,
@@ -125,7 +127,9 @@ class RublicatorG
     "get_motor1_pwm"          => 0x13,
     "get_motor2_pwm"          => 0x14,
     "select_tool"             => 0x15,
-    "is_tool_ready"           => 0x16
+    "is_tool_ready"           => 0x16,
+    
+    "get_build_name"          => 0x22
   }
   
   @@response_codes = {
@@ -188,8 +192,8 @@ class RublicatorG
 
     send_cmd(msg)
 
-    # hackish timing
-    sleep(2)
+    # FIXME: ugly hackish timing, there are much more intelligent ways to handle the delay
+    sleep(1)
 
     if request_reply
       ok,response = recv_reply
@@ -283,6 +287,59 @@ class RublicatorG
     if result = send_and_receive([@@motherboard_codes["version"]])
       result = result.unpack("v")[0]
       "#{result/100}.#{result % 100}"
+    else
+      false
+    end
+  end
+
+  def get_motherboard_build_name
+    if result = send_and_receive([@@motherboard_codes["get_build_name"]])
+      result
+    else
+      false
+    end
+  end
+
+  def motherboard_init
+    if result = send_and_receive([@@motherboard_codes["init"]])
+      result
+    else
+      false
+    end
+  end
+
+  def machine_name
+    payload = []
+    payload << @@motherboard_codes["read_eeprom"]
+    # at position: 32, integer uint16 to 2 bytes
+    payload << (32 & 0xff)
+    payload << ((32 >> 8) & 0xff)
+    # length to read: 16
+    payload << 16
+    
+    if result = send_and_receive(payload)
+      result
+    else
+      false
+    end
+  end
+
+  def get_toolhead_version(tool_id=0)
+    payload = [@@motherboard_codes["tool_query"], tool_id, @@toolhead_codes["version"]]
+    
+    if result = send_and_receive(payload)
+      result = result.unpack("v")[0]
+      "#{result/100}.#{result % 100}"
+    else
+      false
+    end
+  end
+
+  def get_toolhead_build_name(tool_id=0)
+    payload = [@@motherboard_codes["tool_query"], tool_id, @@toolhead_codes["get_build_name"]]
+    
+    if result = send_and_receive(payload)
+      result
     else
       false
     end
