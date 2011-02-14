@@ -323,6 +323,28 @@ class RublicatorG
       false
     end
   end
+  
+  def name=(str)
+    raise "Name too long.  Name must be <= 16 characters." if str.size > 16
+    
+    payload = []
+    payload << @@motherboard_codes["write_eeprom"]
+    # at position: 32, integer uint16 to 2 bytes
+    payload << (32 & 0xff)
+    payload << ((32 >> 8) & 0xff)
+    # length to write
+    payload << 16
+    # send the name
+    str.ljust(16).each_byte do |byte|
+      payload << byte
+    end
+    
+    if result = send_and_receive(payload)
+      result
+    else
+      false
+    end
+  end
 
   def toolhead_version(tool_id=0)
     payload = [@@motherboard_codes["tool_query"], tool_id, @@toolhead_codes["version"]]
