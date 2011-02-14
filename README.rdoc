@@ -8,4 +8,4 @@ Should eventually be able to do everything that ReplicatorG can do... but for no
 
   makerbot = RublicatorG.new("/dev/tty.usbserial-FTE3Q0I3")
 
-  puts "Motherboard Firmware Version: #{makerbot.get_motherboard_version}"
+  puts "Motherboard Firmware Version: #{makerbot.motherboard_version}"
