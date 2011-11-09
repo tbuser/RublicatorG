@@ -161,9 +161,9 @@ class RublicatorG
 
     @@mutex.synchronize do
       begin
-        @sp = SerialPort.new(dev, 38400, 8, 1, SerialPort::NONE)
+        @sp = SerialPort.new(dev, 115200, 8, 1, SerialPort::NONE)
 
-        @sp.flow_control = SerialPort::HARD
+        # @sp.flow_control = SerialPort::HARD
         @sp.read_timeout = 5000
         $stderr.puts "Cannot connect to #{dev}" if @sp.nil?
       # rescue Errno::EBUSY
@@ -231,11 +231,11 @@ class RublicatorG
     @@mutex.synchronize do
       begin
         header        = @sp.sysread(2)
-        start_byte    = header[0].to_hex_str
-        length        = header[1].unpack("C")[0]
+        start_byte    = header[0..0].to_hex_str
+        length        = header[1..1].unpack("C")[0]
 
         payload       = @sp.sysread(length)
-        response_code = payload[0].unpack("C")[0]
+        response_code = payload[0..0].to_hex_str
         msg           = payload[1..-1]
 
         crc           = @sp.sysread(1).to_hex_str
@@ -247,7 +247,7 @@ class RublicatorG
 
       puts "Received Message: start_byte: #{start_byte} length: #{length} response_code: #{response_code} payload: #{msg.to_hex_str} crc: #{crc}" if $DEBUG
 
-      if response_code != 0x01
+      if response_code != '0x81'
         error = "ERROR: #{@@response_codes[response_code]}"
         return [false,error]
       end
@@ -359,6 +359,38 @@ class RublicatorG
 
   def toolhead_build_name(tool_id=0)
     payload = [@@motherboard_codes["tool_query"], tool_id, @@toolhead_codes["get_build_name"]]
+    
+    if result = send_and_receive(payload)
+      result
+    else
+      false
+    end
+  end
+
+  def filenames
+    filenames = []
+
+    # keep reading until result is blank? or a max of 100
+    100.times do |x|
+      filename = send_and_receive([@@motherboard_codes["next_filename"], x == 0 ? 1 : 0]).gsub(/\000/, '')
+      if filename == ""
+        break
+      else
+        filenames << filename
+      end
+    end      
+
+    filenames
+  end
+  
+  def run(filename)
+    raise "Filename too long.  Name must be <= 12 characters." if filename.size > 12
+    
+    payload = []
+    payload << @@motherboard_codes["playback_file"]
+    filename.each_byte do |byte|
+      payload << byte
+    end
     
     if result = send_and_receive(payload)
       result
