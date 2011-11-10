@@ -15,6 +15,11 @@ Should eventually be able to do everything that ReplicatorG can do... but for no
 Also installs a rublicatorg binary that can be called on the command line.
 
   Usage: rublicatorg [options] [file]
+      -p, --port PORT                  Serial port (can also be specified in ~/.rublicatorgrc)
       -l, --list                       List the files stored on the SD card
       -r, --run FILE                   Run the FILE from the SD card
       -h, --help                       Display this screen
+
+To avoid having to specify the serial port, you can create a ~/.rublicatorgrc file like so:
+
+  port = /dev/tty.usbserial-A600emXZ
