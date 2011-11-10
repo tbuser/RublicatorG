@@ -4,7 +4,7 @@ require "rublicatorg"
 
 $DEBUG = true
 
-makerbot = RublicatorG.new("/dev/tty.usbserial-FTE3Q0I3")
+makerbot = RublicatorG.new("/dev/tty.usbserial-A600emXZ")
 
 old_name = makerbot.name
 puts "Old Machine Name: #{old_name}"

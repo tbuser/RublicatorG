@@ -68,7 +68,9 @@ end
 $DEV ||= nil
 
 class RublicatorG
-  START_BYTE = 0xd5
+  VERSION = "0.0.1"
+  
+  START_BYTE  = 0xd5
   
   @@motherboard_codes = {
     # query

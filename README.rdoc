@@ -1,11 +1,20 @@
-Provides a programming interface to commnicate with a MakerBot or RepRap 3D printer that is using the MakerBot firmware.
+Provides a programming interface to commnicate with a MakerBot 3D Printer.
 
 Should eventually be able to do everything that ReplicatorG can do... but for now it is very incomplete.
 
-=Examples
+=Ruby gem usage
 
   require "rublicatorg"
 
   makerbot = RublicatorG.new("/dev/tty.usbserial-FTE3Q0I3")
 
   puts "Motherboard Firmware Version: #{makerbot.motherboard_version}"
+
+=Command line
+
+Also installs a rublicatorg binary that can be called on the command line.
+
+  Usage: rublicatorg [options] [file]
+      -l, --list                       List the files stored on the SD card
+      -r, --run FILE                   Run the FILE from the SD card
+      -h, --help                       Display this screen
